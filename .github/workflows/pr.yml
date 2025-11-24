@@ -34,4 +34,4 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          terraform plan -out=tfplan
+          terraform plan -var-file="./environments/dev/dev.tfvars" -out=tfplan
