@@ -59,7 +59,7 @@ module "nsg" {
 
 module "nic_nsg_association" {
   for_each                  = var.vms
-  source                    = "./modules/azurerm_network_interface_network_security_group_association"
+  source                    = "./modules/azurerm_network_interface_security_group_association"
   network_interface_id      = module.nic[each.key].nic_id
   network_security_group_id = module.nsg[each.key].nsg_id
 }
