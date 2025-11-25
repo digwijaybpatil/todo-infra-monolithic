@@ -9,3 +9,7 @@ variable "primary_location" {
 variable "environment" {
   type = string
 }
+
+variable "vnet_address_space" {
+  type = string
+}
