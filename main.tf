@@ -64,17 +64,27 @@ module "nic_nsg_association" {
   network_security_group_id = module.nsg[each.key].nsg_id
 }
 
+data "azurerm_key_vault" "existing_kv" {
+  name                = "kv-digwi-shared"
+  resource_group_name = "rg-digwi-shared-kv"
+}
 
-# module "vms" {
-#   for_each = var.vms
-#   source = "./modules/azurerm_linux_virtual_machine"
-#   vm_name = each.key
-#   resource_group_name = module.rg.resource_group_name
-#   location = module.rg.location
-#   vm_size = each.value.vm_size
-#   admin_username = each.value.admin_username
-#   network_interface_ids = []
-#   ssh_public_key = 
-#   os_disk = each.value.os_disk
-#   source_image_reference = each.value.source_image_reference
-# }
+data "azurerm_key_vault_secret" "public_ssh_key" {
+  name         = "vm-ssh-public-key"
+  key_vault_id = data.azurerm_key_vault.existing_kv.id
+}
+
+
+module "vm" {
+  for_each               = var.vms
+  source                 = "./modules/azurerm_linux_virtual_machine"
+  vm_name                = each.key
+  resource_group_name    = module.rg.resource_group_name
+  location               = module.rg.location
+  vm_size                = each.value.vm_size
+  admin_username         = each.value.admin_username
+  network_interface_ids  = [module.nic[each.key].nic_id]
+  ssh_public_key         = data.azurerm_key_vault_secret.public_ssh_key.value
+  os_disk                = each.value.os_disk
+  source_image_reference = each.value.source_image_reference
+}

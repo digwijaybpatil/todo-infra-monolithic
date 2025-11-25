@@ -3,7 +3,7 @@ environment = "dev"
 vnet_address_space = "10.10.0.0/22"
 
 vms = {
-  webvm1 = {
+  webvm = {
     vm_size        = "Standard_B1s"
     admin_username = "adminuser"
     subnet_name    = "web"
@@ -54,7 +54,7 @@ vms = {
     ]
   }
 
-  appvm1 = {
+  appvm = {
     vm_size        = "Standard_B1s"
     admin_username = "adminuser"
     subnet_name    = "app"
