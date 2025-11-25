@@ -29,3 +29,36 @@ module "subnet" {
   vnet_name           = module.vnet.vnet_name
   address_prefixes    = [each.value]
 }
+
+module "pip" {
+  for_each            = var.vms
+  source              = "./modules/azurerm_public_ip"
+  pip_name            = "pip-${each.key}-${var.environment}"
+  resource_group_name = module.rg.resource_group_name
+  location            = module.rg.location
+}
+
+module "nic" {
+  for_each             = var.vms
+  source               = "./modules/azurerm_network_interface"
+  nic_name             = "nic-${each.key}-${var.environment}"
+  resource_group_name  = module.rg.resource_group_name
+  location             = module.rg.location
+  subnet_id            = module.subnet[each.value.subnet_name].subnet_id
+  public_ip_address_id = module.pip[each.key].pip_id
+}
+
+
+# module "vms" {
+#   for_each = var.vms
+#   source = "./modules/azurerm_linux_virtual_machine"
+#   vm_name = each.key
+#   resource_group_name = module.rg.resource_group_name
+#   location = module.rg.location
+#   vm_size = each.value.vm_size
+#   admin_username = each.value.admin_username
+#   network_interface_ids = []
+#   ssh_public_key = 
+#   os_disk = each.value.os_disk
+#   source_image_reference = each.value.source_image_reference
+# }
