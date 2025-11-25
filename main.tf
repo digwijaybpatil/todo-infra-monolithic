@@ -109,19 +109,19 @@ module "sql_db" {
   sql_server_id = module.sql_server.sql_server_id
 }
 
-module "sql_private_endpoint" {
-  source = "./modules/azurerm_sqlserver_private_endpoint"
+# module "sql_private_endpoint" {
+#   source = "./modules/azurerm_sqlserver_private_endpoint"
 
-  resource_group_name = module.rg.resource_group_name
-  location            = module.rg.location
+#   resource_group_name = module.rg.resource_group_name
+#   location            = module.rg.location
 
-  dns_zone_name = "privatelink.database.windows.net"
-  dns_link_name = "sql-dns-link-${var.application_name}-${var.environment}"
+#   dns_zone_name = "privatelink.database.windows.net"
+#   dns_link_name = "sql-dns-link-${var.application_name}-${var.environment}"
 
-  virtual_network_id = module.vnet.vnet_id
-  subnet_id          = module.subnet["data"].subnet_id
+#   virtual_network_id = module.vnet.vnet_id
+#   subnet_id          = module.subnet["data"].subnet_id
 
-  private_endpoint_name = "pe-sql-${var.application_name}-${var.environment}"
+#   private_endpoint_name = "pe-sql-${var.application_name}-${var.environment}"
 
-  sql_server_id = module.sql_server.sql_server_id
-}
+#   sql_server_id = module.sql_server.sql_server_id
+# }
