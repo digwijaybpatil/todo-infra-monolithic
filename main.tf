@@ -1,13 +1,31 @@
 module "rg" {
-  source = "./modules/azurerm_resource_group"
+  source              = "./modules/azurerm_resource_group"
   resource_group_name = "rg-${var.application_name}-${var.environment}"
-  location = var.primary_location
+  location            = var.primary_location
 }
 
 module "vnet" {
-  source = "./modules/azurerm_virtual_network"
-  vnet_name = "vnet-${var.application_name}-${var.environment}"
-  location = var.primary_location
+  source              = "./modules/azurerm_virtual_network"
+  vnet_name           = "vnet-${var.application_name}-${var.environment}"
+  location            = var.primary_location
   resource_group_name = module.rg.resource_group_name
-  address_space = [var.vnet_address_space]
+  address_space       = [var.vnet_address_space]
+}
+
+locals {
+  subnets = {
+    AzureBastionSubnet = cidrsubnet(var.vnet_address_space, 4, 0)
+    web                = cidrsubnet(var.vnet_address_space, 2, 1)
+    app                = cidrsubnet(var.vnet_address_space, 2, 2)
+    data               = cidrsubnet(var.vnet_address_space, 2, 3)
+  }
+}
+
+module "subnet" {
+  for_each            = local.subnets
+  source              = "./modules/azurerm_subnet"
+  subnet_name         = each.key
+  resource_group_name = module.rg.resource_group_name
+  vnet_name           = module.vnet.vnet_name
+  address_prefixes    = [each.value]
 }
