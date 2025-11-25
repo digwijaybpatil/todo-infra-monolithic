@@ -88,3 +88,24 @@ module "vm" {
   os_disk                = each.value.os_disk
   source_image_reference = each.value.source_image_reference
 }
+
+data "azurerm_key_vault_secret" "sql_admin_password" {
+  name         = "sql-admin-password"
+  key_vault_id = data.azurerm_key_vault.existing_kv.id
+}
+
+module "sql_server" {
+  source                       = "./modules/azurerm_mysql_server"
+  sql_server_name              = "sqlserver${var.application_name}${var.environment}"
+  resource_group_name          = module.rg.resource_group_name
+  location                     = module.rg.location
+  administrator_login          = "sqladminuser"
+  administrator_login_password = data.azurerm_key_vault_secret.sql_admin_password.value
+}
+
+module "sql_db" {
+  source        = "./modules/azurerm_mysql_database"
+  database_name = "sqldb-${var.application_name}-${var.environment}"
+  sql_server_id = module.sql_server.sql_server_id
+}
+
