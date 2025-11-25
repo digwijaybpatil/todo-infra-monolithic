@@ -110,7 +110,7 @@ module "sql_db" {
 }
 
 module "sql_private_endpoint" {
-  source = "./modules/azurerm_private_endpoint_sql"
+  source = "./modules/azurerm_sql_private_endpoint"
 
   resource_group_name = module.rg.resource_group_name
   location            = module.rg.location
@@ -119,7 +119,7 @@ module "sql_private_endpoint" {
   dns_link_name = "sql-dns-link-${var.application_name}-${var.environment}"
 
   virtual_network_id = module.vnet.vnet_id
-  subnet_id          = module.subnet["data"].subnet_id  
+  subnet_id          = module.subnet["data"].subnet_id
 
   private_endpoint_name = "pe-sql-${var.application_name}-${var.environment}"
 
