@@ -95,7 +95,7 @@ data "azurerm_key_vault_secret" "sql_admin_password" {
 }
 
 module "sql_server" {
-  source                       = "./modules/azurerm_mysql_server"
+  source                       = "./modules/azurerm_mssql_server"
   sql_server_name              = "sqlserver${var.application_name}${var.environment}"
   resource_group_name          = module.rg.resource_group_name
   location                     = module.rg.location
@@ -104,7 +104,7 @@ module "sql_server" {
 }
 
 module "sql_db" {
-  source        = "./modules/azurerm_mysql_database"
+  source        = "./modules/azurerm_mssql_database"
   database_name = "sqldb-${var.application_name}-${var.environment}"
   sql_server_id = module.sql_server.sql_server_id
 }
