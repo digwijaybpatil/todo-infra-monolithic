@@ -110,7 +110,7 @@ module "sql_db" {
 }
 
 module "sql_private_endpoint" {
-  source = "./modules/azurerm_sql_private_endpoint"
+  source = "./modules/azurerm_sqlserver_private_endpoint"
 
   resource_group_name = module.rg.resource_group_name
   location            = module.rg.location
