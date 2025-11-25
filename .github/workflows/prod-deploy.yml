@@ -3,7 +3,6 @@ name: todo-infra-prod-deploy
 # Controls when the workflow will run
 on:
   workflow_dispatch:
-    
 
 permissions:
   id-token: write
@@ -26,7 +25,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Azure Login
+      - name: Azure Login #Used OIDC to login to azure
         uses: azure/login@v2.3.0
         with:
           client-id: ${{ secrets.CLIENT_ID }}
@@ -43,9 +42,8 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          terraform plan -var-file="./environments/dev/dev.tfvars" -out=tfplan
+          terraform plan -var-file="./environments/prod/prod.tfvars" -out=tfplan
 
-  
   deploy:
     name: terraform apply
     runs-on: ubuntu-latest
@@ -64,7 +62,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Azure Login
+      - name: Azure Login #Used OIDC to login to azure
         uses: azure/login@v2.3.0
         with:
           client-id: ${{ secrets.CLIENT_ID }}
@@ -79,6 +77,10 @@ jobs:
           -backend-config="container_name=tfstate" \
           -backend-config="key=todo-dev.tfstate"
 
+      - name: Terraform Plan
+        run: |
+          terraform plan -var-file="./environments/prod/prod.tfvars" -out=tfplan
+
       - name: Terraform Apply
         run: |
-          terraform apply -var-file="./environments/dev/dev.tfvars" tfplan
+          terraform apply -var-file="./environments/prod/prod.tfvars" tfplan

@@ -21,7 +21,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Azure Login
-        uses: azure/login@v2.3.0
+        uses: azure/login@v2.3.0 #used OIDC to login to azure
         with:
           client-id: ${{ secrets.CLIENT_ID }}
           tenant-id: ${{ secrets.TENANT_ID }}
@@ -37,4 +37,4 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          terraform plan -out=tfplan
+          terraform plan -var-file="./environments/dev/dev.tfvars" -out=tfplan
