@@ -33,7 +33,7 @@ module "subnet" {
 module "pip" {
   for_each            = var.vms
   source              = "./modules/azurerm_public_ip"
-  pip_name            = "pip-${each.key}-${var.environment}"
+  pip_name            = "pip-${each.key}-${var.application_name}-${var.environment}"
   resource_group_name = module.rg.resource_group_name
   location            = module.rg.location
 }
@@ -41,11 +41,27 @@ module "pip" {
 module "nic" {
   for_each             = var.vms
   source               = "./modules/azurerm_network_interface"
-  nic_name             = "nic-${each.key}-${var.environment}"
+  nic_name             = "nic-${each.key}-${var.application_name}-${var.environment}"
   resource_group_name  = module.rg.resource_group_name
   location             = module.rg.location
   subnet_id            = module.subnet[each.value.subnet_name].subnet_id
   public_ip_address_id = module.pip[each.key].pip_id
+}
+
+module "nsg" {
+  for_each            = var.vms
+  source              = "./modules/azurerm_network_security_group"
+  nsg_name            = "nsg-${each.key}-${var.application_name}-${var.environment}"
+  resource_group_name = module.rg.resource_group_name
+  location            = module.rg.location
+  security_rules      = each.value.security_rules
+}
+
+module "nic_nsg_association" {
+  for_each                  = var.vms
+  source                    = "./modules/azurerm_network_interface_security_group_association"
+  network_interface_id      = module.nic[each.key].nic_id
+  network_security_group_id = module.nsg[each.key].nsg_id
 }
 
 
